@@ -34,9 +34,6 @@ var sbuf = new ByteBuffer().encoding('ascii').bigEndian().string('abc123');
 var rbuf = new ByteBuffer(sbuf.pack()).encoding('ascii').bigEndian();
 console.log(rbuf.string().unpack());
 
-
-
-
 ```
 
 install
