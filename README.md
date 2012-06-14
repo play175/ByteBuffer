@@ -26,3 +26,8 @@ console.log(arr);
 
 
 ```
+
+install
+```javascript
+npm install ByteBuffer -g
+```
