@@ -27,12 +27,13 @@ var arr = rbuf.string()//变长字符串，前两个字节表示长度
 console.log(arr);
 
 
-//指定字符编码(默认：utf8):utf8/ascii/
-var rbuf = new ByteBuffer(buffer).encoding('ascii');
 
+//指定字符编码(默认：utf8):utf8/ascii/
 //指定字节序(默认：LittleEndian)
-var rbuf = new ByteBuffer(buffer).bigEndian();
-var rbuf = new ByteBuffer(buffer).littleEndian();
+var sbuf = new ByteBuffer().encoding('ascii').bigEndian().string('中文');
+var rbuf = new ByteBuffer(sbuf.pack()).encoding('ascii').bigEndian();
+console.log(rbuf.string().unpack());
+
 
 
 ```
