@@ -8,7 +8,7 @@ var buffer = sbuf.string('abc123你好')//变长字符串，前两个字节表�
                        .int64(9999999).double(-0.000005).short(32767).ushort(65535)
                        .byte(255)
                        .vstring('abcd',5)//定长字符串,不足的字节补0x00
-                       .pack();
+                       .pack();//结尾调用打包方法
 
 console.log(buffer);
 
@@ -20,7 +20,7 @@ var arr = rbuf.string()//变长字符串，前两个字节表示长度
                     .int64().double().short().ushort()
                     .byte()
                     .vstring(null,5)//定长字符串,不足的字节补0x00
-                    .unpack();
+                    .unpack();//结尾调用解包方法
 
 console.log(arr);
 
