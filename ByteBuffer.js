@@ -15,13 +15,32 @@ var Type_Int64 = 8;
 var Type_Float = 9;
 var Type_Double = 10;
 
-var ByteBuffer = function (org_buf,encoding) {
+var ByteBuffer = function (org_buf) {
 
     var _org_buf = org_buf;
-    var _encoding = encoding || 'utf8';
+    var _encoding = 'utf8';
     var _offset = 0;
     var _list = [];
     var _offset = 0;
+    var _endian = 'L';
+
+    //指定文字编码
+    this.encoding = function(encode){
+        _encoding = encode;
+        return this;
+    };
+    
+    //指定字节序 为BigEndian
+    this.bigEndian = function(){
+       _endian = 'B';
+        return this;
+    };
+
+    //指定字节序 为LittleEndian
+    this.littleEndian = function(){
+       _endian = 'L';
+        return this;
+    };
 
     this.byte = function(val){
         if(val == undefined){
@@ -36,7 +55,7 @@ var ByteBuffer = function (org_buf,encoding) {
 
     this.short = function(val){
         if(val == undefined){
-           _list.push(_org_buf.readInt16LE(_offset));
+           _list.push(_org_buf['readInt16'+_endian+'E'](_offset));
            _offset+=2;
         }else{
             _list.push({t:Type_Short,d:val,l:2});
@@ -47,7 +66,7 @@ var ByteBuffer = function (org_buf,encoding) {
 
     this.ushort = function(val){
         if(val == undefined){
-           _list.push(_org_buf.readUInt16LE(_offset));
+           _list.push(_org_buf['readUInt16'+_endian+'E'](_offset));
            _offset+=2;
         }else{
             _list.push({t:Type_UShort,d:val,l:2});
@@ -58,7 +77,7 @@ var ByteBuffer = function (org_buf,encoding) {
 
     this.int32 = function(val){
         if(val == undefined){
-           _list.push(_org_buf.readInt32LE(_offset));
+           _list.push(_org_buf['readInt32'+_endian+'E'](_offset));
            _offset+=4;
         }else{
             _list.push({t:Type_Int32,d:val,l:4});
@@ -69,7 +88,7 @@ var ByteBuffer = function (org_buf,encoding) {
 
     this.uint32 = function(val){
         if(val == undefined){
-           _list.push(_org_buf.readUInt32LE(_offset));
+           _list.push(_org_buf['readUInt32'+_endian+'E'](_offset));
            _offset+=4;
         }else{
             _list.push({t:Type_UInt32,d:val,l:4});
@@ -83,7 +102,7 @@ var ByteBuffer = function (org_buf,encoding) {
     **/
     this.string = function(val){
         if(val == undefined){
-           var len = _org_buf.readInt16LE(_offset);
+           var len = _org_buf['readInt16'+_endian+'E'](_offset);
            _offset+=2;
            _list.push(_org_buf.toString(_encoding, _offset, _offset+len));
            _offset+=len;
@@ -120,7 +139,7 @@ var ByteBuffer = function (org_buf,encoding) {
 
     this.int64 = function(val){
         if(val == undefined){
-           _list.push(_org_buf.readDoubleLE(_offset));
+           _list.push(_org_buf['readDouble'+_endian+'E'](_offset));
            _offset+=8;
         }else{
             _list.push({t:Type_Int64,d:val,l:8});
@@ -131,7 +150,7 @@ var ByteBuffer = function (org_buf,encoding) {
 
     this.float = function(val){
         if(val == undefined){
-           _list.push(_org_buf.readFloatLE(_offset));
+           _list.push(_org_buf['readFloat'+_endian+'E'](_offset));
            _offset+=4;
         }else{
             _list.push({t:Type_Float,d:val,l:4});
@@ -142,7 +161,7 @@ var ByteBuffer = function (org_buf,encoding) {
 
     this.double = function(val){
         if(val == undefined){
-           _list.push(_org_buf.readDoubleLE(_offset));
+           _list.push(_org_buf['readDouble'+_endian+'E'](_offset));
            _offset+=8;
         }else{
             _list.push({t:Type_Double,d:val,l:8});
@@ -171,24 +190,24 @@ var ByteBuffer = function (org_buf,encoding) {
                     offset+=_list[i].l;
                     break;
                 case Type_Short:
-                    _org_buf.writeInt16LE(_list[i].d,offset);
+                    _org_buf['writeInt16'+_endian+'E'](_list[i].d,offset);
                     offset+=_list[i].l;
                     break;
                 case Type_UShort:
-                    _org_buf.writeUInt16LE(_list[i].d,offset);
+                    _org_buf['writeUInt16'+_endian+'E'](_list[i].d,offset);
                     offset+=_list[i].l;
                     break;
                 case Type_Int32:
-                    _org_buf.writeInt32LE(_list[i].d,offset);
+                    _org_buf['writeInt32'+_endian+'E'](_list[i].d,offset);
                     offset+=_list[i].l;
                     break;
                 case Type_UInt32:
-                    _org_buf.writeUInt32LE(_list[i].d,offset);
+                    _org_buf['writeUInt32'+_endian+'E'](_list[i].d,offset);
                     offset+=_list[i].l;
                     break;
                 case Type_String:
                     //前2个字节表示字符串长度
-                    _org_buf.writeInt16LE(_list[i].l,offset);
+                    _org_buf['writeInt16'+_endian+'E'](_list[i].l,offset);
                     offset+=2;
                     _org_buf.write(_list[i].d,_encoding,offset);
                     offset+=_list[i].l;
@@ -203,15 +222,15 @@ var ByteBuffer = function (org_buf,encoding) {
                     offset+=_list[i].l;
                     break;
                 case Type_Int64:
-                    _org_buf.writeDoubleLE(_list[i].d,offset);
+                    _org_buf['writeDouble'+_endian+'E'](_list[i].d,offset);
                     offset+=_list[i].l;
                     break;
                 case Type_Float:
-                    _org_buf.writeFloatLE(_list[i].d,offset);
+                    _org_buf['writeFloat'+_endian+'E'](_list[i].d,offset);
                     offset+=_list[i].l;
                     break;
                 case Type_Double:
-                    _org_buf.writeDoubleLE(_list[i].d,offset);
+                    _org_buf['writeDouble'+_endian+'E'](_list[i].d,offset);
                     offset+=_list[i].l;
                     break;
             }
