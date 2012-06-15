@@ -15,11 +15,16 @@ var Type_Int64 = 8;
 var Type_Float = 9;
 var Type_Double = 10;
 
-var ByteBuffer = function (org_buf) {
+/*
+* 构造方法
+* @param org_buf 需要解包的二进制
+* @param offset 指定数据在二进制的初始位置 默认是0
+*/
+var ByteBuffer = function (org_buf,offset) {
 
     var _org_buf = org_buf;
     var _encoding = 'utf8';
-    var _offset = 0;
+    var _offset = offset || 0;
     var _list = [];
     var _offset = 0;
     var _endian = 'L';
@@ -42,56 +47,56 @@ var ByteBuffer = function (org_buf) {
         return this;
     };
 
-    this.byte = function(val){
-        if(val == undefined){
+    this.byte = function(val,index){
+        if(val == undefined || val == null){
            _list.push(_org_buf.readUInt8(_offset));
            _offset+=1;
         }else{
-            _list.push({t:Type_Byte,d:val,l:1});
+            _list.splice(index != undefined ? index : _list.length,0,{t:Type_Byte,d:val,l:1});
             _offset += 1;
         }
         return this;
     };
 
-    this.short = function(val){
-        if(val == undefined){
+    this.short = function(val,index){
+        if(val == undefined || val == null){
            _list.push(_org_buf['readInt16'+_endian+'E'](_offset));
            _offset+=2;
         }else{
-            _list.push({t:Type_Short,d:val,l:2});
+            _list.splice(index != undefined ? index : _list.length,0,{t:Type_Short,d:val,l:2});
             _offset += 2;
         }
         return this;
     };
 
-    this.ushort = function(val){
-        if(val == undefined){
+    this.ushort = function(val,index){
+        if(val == undefined || val == null){
            _list.push(_org_buf['readUInt16'+_endian+'E'](_offset));
            _offset+=2;
         }else{
-            _list.push({t:Type_UShort,d:val,l:2});
+            _list.splice(index != undefined ? index : _list.length,0,{t:Type_UShort,d:val,l:2});
             _offset += 2;
         }
         return this;
     };
 
-    this.int32 = function(val){
-        if(val == undefined){
+    this.int32 = function(val,index){
+        if(val == undefined || val == null){
            _list.push(_org_buf['readInt32'+_endian+'E'](_offset));
            _offset+=4;
         }else{
-            _list.push({t:Type_Int32,d:val,l:4});
+            _list.splice(index != undefined ? index : _list.length,0,{t:Type_Int32,d:val,l:4});
             _offset += 4;
         }
         return this;
     };
 
-    this.uint32 = function(val){
-        if(val == undefined){
+    this.uint32 = function(val,index){
+        if(val == undefined || val == null){
            _list.push(_org_buf['readUInt32'+_endian+'E'](_offset));
            _offset+=4;
         }else{
-            _list.push({t:Type_UInt32,d:val,l:4});
+            _list.splice(index != undefined ? index : _list.length,0,{t:Type_UInt32,d:val,l:4});
             _offset += 4;
         }
         return this;
@@ -100,8 +105,8 @@ var ByteBuffer = function (org_buf) {
     /**
     * 变长字符串 前2个字节表示字符串长度
     **/
-    this.string = function(val){
-        if(val == undefined){
+    this.string = function(val,index){
+        if(val == undefined || val == null){
            var len = _org_buf['readInt16'+_endian+'E'](_offset);
            _offset+=2;
            _list.push(_org_buf.toString(_encoding, _offset, _offset+len));
@@ -109,7 +114,7 @@ var ByteBuffer = function (org_buf) {
         }else{
             var len = 0;
             if(val)len = Buffer.byteLength(val, _encoding);
-            _list.push({t:Type_String,d:val,l:len});
+            _list.splice(index != undefined ? index : _list.length,0,{t:Type_String,d:val,l:len});
             _offset += len + 2;
         }
         return this;
@@ -118,7 +123,7 @@ var ByteBuffer = function (org_buf) {
     /**
     * 定长字符串 val为null时，读取定长字符串（需指定长度len）
     **/
-    this.vstring = function(val,len){
+    this.vstring = function(val,len,index){
         if(!len){
             throw new Error('vstring must got len argument');
             return this;
@@ -131,40 +136,40 @@ var ByteBuffer = function (org_buf) {
             _list.push(_org_buf.toString(_encoding, _offset, _offset+vlen));
             _offset+=len;
         }else{
-            _list.push({t:Type_VString,d:val,l:len});
+            _list.splice(index != undefined ? index : _list.length,0,{t:Type_VString,d:val,l:len});
             _offset += len;
         }
         return this;
     };
 
-    this.int64 = function(val){
-        if(val == undefined){
+    this.int64 = function(val,index){
+        if(val == undefined || val == null){
            _list.push(_org_buf['readDouble'+_endian+'E'](_offset));
            _offset+=8;
         }else{
-            _list.push({t:Type_Int64,d:val,l:8});
+            _list.splice(index != undefined ? index : _list.length,0,{t:Type_Int64,d:val,l:8});
             _offset += 8;
         }
         return this;
     };
 
-    this.float = function(val){
-        if(val == undefined){
+    this.float = function(val,index){
+        if(val == undefined || val == null){
            _list.push(_org_buf['readFloat'+_endian+'E'](_offset));
            _offset+=4;
         }else{
-            _list.push({t:Type_Float,d:val,l:4});
+            _list.splice(index != undefined ? index : _list.length,0,{t:Type_Float,d:val,l:4});
             _offset += 4;
         }
         return this;
     };
 
-    this.double = function(val){
-        if(val == undefined){
+    this.double = function(val,index){
+        if(val == undefined || val == null){
            _list.push(_org_buf['readDouble'+_endian+'E'](_offset));
            _offset+=8;
         }else{
-            _list.push({t:Type_Double,d:val,l:8});
+            _list.splice(index != undefined ? index : _list.length,0,{t:Type_Double,d:val,l:8});
             _offset += 8;
         }
         return this;
@@ -179,10 +184,15 @@ var ByteBuffer = function (org_buf) {
 
     /**
     * 打包成二进制
+    * @param ifHead 是否在前面加上2个字节表示包长
     **/
-    this.pack = function(){
-        _org_buf = new Buffer(_offset);
+    this.pack = function(ifHead){
+        _org_buf = new Buffer((ifHead)?_offset+2:_offset);
         var offset = 0;
+        if(ifHead){
+            _org_buf['writeUInt16'+_endian+'E'](_offset,offset);
+            offset+=2;
+        }
         for (var i = 0; i < _list.length; i++) {
             switch(_list[i].t){
                 case Type_Byte:
@@ -240,16 +250,3 @@ var ByteBuffer = function (org_buf) {
 }
 
 module.exports = exports = ByteBuffer;
-
-
-/****************************************************************
-//压包
-var sbuf = new ByteBuffer();
-var buffer = sbuf.string('abc123').int32(999).float(0.5).int64(9999999).double(-0.5).pack();
-console.log(buffer);
-
-//解包
-var rbuf = new ByteBuffer(buffer);
-var arr = rbuf.string().int32().float().int64().double().unpack();
-console.log(arr);
-****************************************************************/
