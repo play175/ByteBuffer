@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Bytebuffer by play175</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Bytebuffer</h1>
+        <p>nodejs版本的ByteBuffer，和C++通信的利器！</p>
+        <p class="view"><a href="https://github.com/play175/ByteBuffer">View the Project on GitHub <small>play175/ByteBuffer</small></a></p>
+        <ul>
+          <li><a href="https://github.com/play175/ByteBuffer/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/play175/ByteBuffer/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/play175/ByteBuffer">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>nodejs版本的ByteBuffer和C++通信的利器！</p>
+
+<div class="highlight">
+<pre><span class="kd">var</span> <span class="nx">ByteBuffer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./ByteBuffer'</span><span class="p">);</span>
+
+<span class="cm">/*************************基本操作****************************/</span>
+
+<span class="c1">//压包操作</span>
+<span class="kd">var</span> <span class="nx">sbuf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ByteBuffer</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="nx">sbuf</span><span class="p">.</span><span class="nx">string</span><span class="p">(</span><span class="s1">'abc123你好'</span><span class="p">)</span><span class="c1">//变长字符串，前两个字节表示长度</span>
+                       <span class="p">.</span><span class="nx">int32</span><span class="p">(</span><span class="o">-</span><span class="mi">999</span><span class="p">).</span><span class="nx">uint32</span><span class="p">(</span><span class="mi">999</span><span class="p">).</span><span class="kr">float</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span>
+                       <span class="p">.</span><span class="nx">int64</span><span class="p">(</span><span class="mi">9999999</span><span class="p">).</span><span class="kr">double</span><span class="p">(</span><span class="o">-</span><span class="mf">0.000005</span><span class="p">).</span><span class="kr">short</span><span class="p">(</span><span class="mi">32767</span><span class="p">).</span><span class="nx">ushort</span><span class="p">(</span><span class="mi">65535</span><span class="p">)</span>
+                       <span class="p">.</span><span class="kr">byte</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span>
+                       <span class="p">.</span><span class="nx">vstring</span><span class="p">(</span><span class="s1">'abcd'</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span><span class="c1">//定长字符串,不足的字节补0x00</span>
+                       <span class="p">.</span><span class="nx">pack</span><span class="p">();</span><span class="c1">//结尾调用打包方法</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">buffer</span><span class="p">);</span>
+
+<span class="c1">//解包操作</span>
+<span class="kd">var</span> <span class="nx">rbuf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ByteBuffer</span><span class="p">(</span><span class="nx">buffer</span><span class="p">);</span>
+<span class="c1">//解包出来是一个数组</span>
+<span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="nx">rbuf</span><span class="p">.</span><span class="nx">string</span><span class="p">()</span><span class="c1">//变长字符串，前两个字节表示长度</span>
+                    <span class="p">.</span><span class="nx">int32</span><span class="p">().</span><span class="nx">uint32</span><span class="p">().</span><span class="kr">float</span><span class="p">()</span>
+                    <span class="p">.</span><span class="nx">int64</span><span class="p">().</span><span class="kr">double</span><span class="p">().</span><span class="kr">short</span><span class="p">().</span><span class="nx">ushort</span><span class="p">()</span>
+                    <span class="p">.</span><span class="kr">byte</span><span class="p">()</span>
+                    <span class="p">.</span><span class="nx">vstring</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span><span class="c1">//定长字符串,不足的字节补0x00</span>
+                    <span class="p">.</span><span class="nx">unpack</span><span class="p">();</span><span class="c1">//结尾调用解包方法</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">arr</span><span class="p">);</span>
+
+
+<span class="cm">/*************************更多操作****************************/</span>
+
+<span class="c1">//指定字符编码(默认：utf8):utf8/ascii/</span>
+<span class="kd">var</span> <span class="nx">sbuf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ByteBuffer</span><span class="p">().</span><span class="nx">encoding</span><span class="p">(</span><span class="s1">'ascii'</span><span class="p">);</span>
+
+<span class="c1">//指定字节序(默认：LittleEndian)</span>
+<span class="kd">var</span> <span class="nx">sbuf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ByteBuffer</span><span class="p">().</span><span class="nx">bigEndian</span><span class="p">();</span>
+
+<span class="c1">//指定数据在二进制的初始位置 默认是0</span>
+<span class="kd">var</span> <span class="nx">sbuf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ByteBuffer</span><span class="p">(</span><span class="nx">buffer</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+
+<span class="c1">//插入数据到指定位置</span>
+<span class="kd">var</span> <span class="nx">sbuf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ByteBuffer</span><span class="p">();</span>
+<span class="nx">sbuf</span><span class="p">.</span><span class="nx">int32</span><span class="p">(</span><span class="mi">9999</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="c1">//把这个int32数据插入到ByteBuffer的第一个位置</span>
+
+<span class="c1">//在打包的时候在开始位置插入一个short型表示包长(通信层中的包头)</span>
+<span class="kd">var</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="nx">sbuf</span><span class="p">.</span><span class="nx">pack</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+
+</pre>
+</div>
+
+
+<p>install</p>
+
+<div class="highlight">
+<pre><span class="nx">npm</span> <span class="nx">install</span> <span class="nx">ByteBuffer</span> <span class="o">-</span><span class="nx">g</span>
+</pre>
+</div>
+
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/play175">play175</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    
+  </body>
+</html>
