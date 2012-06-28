@@ -247,6 +247,14 @@ var ByteBuffer = function (org_buf,offset) {
         }
         return _org_buf;
     };
+    
+     /**
+    * 未读数据长度
+    **/
+    this.getAvailable = function(){
+        if(!_org_buf)return _offset;
+        return _org_buf.length - _offset;
+    };
 }
 
 module.exports = exports = ByteBuffer;
