@@ -1,36 +1,44 @@
 <!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Bytebuffer by play175</title>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
+  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
 
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>Bytebuffer</h1>
-        <p>nodejs版本的ByteBuffer，和C++通信的利器！</p>
-        <p class="view"><a href="https://github.com/play175/ByteBuffer">View the Project on GitHub <small>play175/ByteBuffer</small></a></p>
-        <ul>
-          <li><a href="https://github.com/play175/ByteBuffer/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/play175/ByteBuffer/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/play175/ByteBuffer">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <p>nodejs版本的ByteBuffer和C++通信的利器！</p>
+  <title>Bytebuffer</title>
+  <meta name="description" content="nodejs版本的ByteBuffer，和C++通信的利器！">
 
-<div class="highlight">
-<pre><span class="kd">var</span> <span class="nx">ByteBuffer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./ByteBuffer'</span><span class="p">);</span>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <header>
+      <h1 class="title">Bytebuffer</h1>
+    </header>
+    <div id="container">
+      <p class="tagline">nodejs版本的ByteBuffer，和C++通信的利器！</p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/play175/ByteBuffer/tarball/master" class="download-button tar"><span>Download</span></a>
+          <a href="https://github.com/play175/ByteBuffer/zipball/master" class="download-button zip"><span>Download</span></a>
+          <a href="https://github.com/play175/ByteBuffer" class="code">View Bytebuffer on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <p>nodejs版本的ByteBuffer和C++通信的利器！</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">ByteBuffer</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./ByteBuffer'</span><span class="p">);</span>
 
 <span class="cm">/*************************基本操作****************************/</span>
 
@@ -63,8 +71,8 @@
 <span class="c1">//指定字符编码(默认：utf8):utf8/ascii/</span>
 <span class="kd">var</span> <span class="nx">sbuf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ByteBuffer</span><span class="p">().</span><span class="nx">encoding</span><span class="p">(</span><span class="s1">'ascii'</span><span class="p">);</span>
 
-<span class="c1">//指定字节序(默认：LittleEndian)</span>
-<span class="kd">var</span> <span class="nx">sbuf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ByteBuffer</span><span class="p">().</span><span class="nx">bigEndian</span><span class="p">();</span>
+<span class="c1">//指定字节序(默认：BigEndian)</span>
+<span class="kd">var</span> <span class="nx">sbuf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ByteBuffer</span><span class="p">().</span><span class="nx">littleEndian</span><span class="p">();</span>
 
 <span class="c1">//指定数据在二进制的初始位置 默认是0</span>
 <span class="kd">var</span> <span class="nx">sbuf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ByteBuffer</span><span class="p">(</span><span class="nx">buffer</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
@@ -75,25 +83,32 @@
 
 <span class="c1">//在打包的时候在开始位置插入一个short型表示包长(通信层中的包头)</span>
 <span class="kd">var</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="nx">sbuf</span><span class="p">.</span><span class="nx">pack</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
-
-</pre>
-</div>
-
+</pre></div>
 
 <p>install</p>
 
-<div class="highlight">
-<pre><span class="nx">npm</span> <span class="nx">install</span> <span class="nx">ByteBuffer</span> <span class="o">-</span><span class="nx">g</span>
-</pre>
-</div>
-
-      </section>
+<div class="highlight"><pre><span class="nx">npm</span> <span class="nx">install</span> <span class="nx">ByteBuffer</span> <span class="o">-</span><span class="nx">g</span>
+</pre></div>
+        </article>
+      </div>
     </div>
     <footer>
-      <p>Project maintained by <a href="https://github.com/play175">play175</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+      <div class="owner">
+      <p><a href="https://github.com/play175" class="avatar"><img src="https://secure.gravatar.com/avatar/5665ae86914851d9e3651eb2a7678185?s=30&amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-140.png" width="48" height="48"/></a> <a href="https://github.com/play175">play175</a> maintains <a href="https://github.com/play175/ByteBuffer">Bytebuffer</a></p>
+
+
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br/>theme by <a href="http://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
     </footer>
-    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
-    
-  </body>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/play175/ByteBuffer/tarball/master" class="tar">tar</a><a href="https://github.com/play175/ByteBuffer/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+
+  
+</body>
 </html>
