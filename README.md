@@ -34,8 +34,8 @@ console.log(arr);
 //指定字符编码(默认：utf8):utf8/ascii/
 var sbuf = new ByteBuffer().encoding('ascii');
 
-//指定字节序(默认：LittleEndian)
-var sbuf = new ByteBuffer().bigEndian();
+//指定字节序(默认：BigEndian)
+var sbuf = new ByteBuffer().littleEndian();
 
 //指定数据在二进制的初始位置 默认是0
 var sbuf = new ByteBuffer(buffer,2);
