@@ -27,7 +27,7 @@ var ByteBuffer = function (org_buf,offset) {
     var _offset = offset || 0;
     var _list = [];
     var _offset = 0;
-    var _endian = 'L';
+    var _endian = 'B';
 
     //指定文字编码
     this.encoding = function(encode){
