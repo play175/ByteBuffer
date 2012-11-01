@@ -14,6 +14,7 @@ var Type_VString = 7;//定长字符串
 var Type_Int64 = 8;
 var Type_Float = 9;
 var Type_Double = 10;
+var Type_ByteArray = 11;
 
 /*
 * 构造方法
@@ -176,6 +177,32 @@ var ByteBuffer = function (org_buf,offset) {
     };
 
     /**
+    * 写入或读取一段字节数组
+    **/
+    this.byteArray = function(val,len,index){
+        if(!len){
+            throw new Error('byteArray must got len argument');
+            return this;
+        }
+        if(val == undefined || val == null){
+            var arr = [];
+            for(var i = _offset;i<_offset +len;i++){
+                if(i<_org_buf.length){
+                    arr.push(_org_buf.readUInt8(i));
+                }else{
+                    arr.push(0);
+                }
+            }
+            _list.push(arr);
+           _offset+=len;
+        }else{
+            _list.splice(index != undefined ? index : _list.length,0,{t:Type_ByteArray,d:val,l:len});
+            _offset += len;
+        }
+        return this;
+    };
+
+    /**
     * 解包成数据数组
     **/
     this.unpack = function(){
@@ -241,6 +268,18 @@ var ByteBuffer = function (org_buf,offset) {
                     break;
                 case Type_Double:
                     _org_buf['writeDouble'+_endian+'E'](_list[i].d,offset);
+                    offset+=_list[i].l;
+                    break;
+                case Type_ByteArray:
+                    var indx = 0;
+                    for(var j = offset;j<offset+_list[i].l;j++){
+                         if(indx<_list[i].d.length){
+                            _org_buf.writeUInt8(_list[i].d[indx],j);
+                         }else{//不够的话，后面补齐0x00
+                            _org_buf.writeUInt8(0,j);
+                         }
+                         indx++
+                    }
                     offset+=_list[i].l;
                     break;
             }
