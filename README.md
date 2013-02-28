@@ -1,5 +1,7 @@
 nodejs版本的ByteBuffer和C++通信的利器！
 
+推荐结合ExBuffer来实现网络协议：https://github.com/play175/ExBuffer
+
 ```javascript
 var ByteBuffer = require('./ByteBuffer');
 
