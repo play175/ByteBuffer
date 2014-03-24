@@ -251,6 +251,13 @@ package
 		public function unpack ():Array{
 			return _list;
 		}
+		
+		/**
+		* 打包成二进制,在前面加上2个字节表示包长
+		**/
+		public function packWithHead ():ByteArray {
+			return pack(true);
+		}
 
 		/**
 		* 打包成二进制
