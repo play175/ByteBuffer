@@ -27,7 +27,6 @@ var ByteBuffer = function (org_buf,offset) {
     var _encoding = 'utf8';
     var _offset = offset || 0;
     var _list = [];
-    var _offset = 0;
     var _endian = 'B';
 
     //指定文字编码
@@ -207,6 +206,13 @@ var ByteBuffer = function (org_buf,offset) {
     **/
     this.unpack = function(){
         return _list;
+    };
+    
+    /**
+    * 打包成二进制,在前面加上2个字节表示包长
+    **/
+    this.packWithHead = function(){
+      return this.pack(true);
     };
 
     /**
