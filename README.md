@@ -49,7 +49,7 @@ var sbuf = new ByteBuffer();
 sbuf.int32(9999,0);//把这个int32数据插入到ByteBuffer的第一个位置
 
 //在打包的时候在开始位置插入一个short型表示包长(通信层中的包头)
-var buffer = sbuf.pack(true);
+var buffer = sbuf.packWithHead();
 
 ```
 

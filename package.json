@@ -1,7 +1,7 @@
 {
   "name": "ByteBuffer",
   "description": "pack or unpack a byte array",
-  "homepage"      : "http://play175.github.com/ExBuffer/",
+  "homepage"      : "http://play175.github.com/ByteBuffer/",
   "keywords": [
     "Buffer",
     "byte array",
@@ -9,7 +9,7 @@
     "unpack"
   ],
   "author"        : "yoyo <http://yoyo.play175.com>",
-  "repository"    : {"type": "git", "url": "https://github.com/play175/ExBuffer.git"},
+  "repository"    : {"type": "git", "url": "https://github.com/play175/ByteBuffer.git"},
   "main": "ByteBuffer.js",
   "version"       : "0.2.6"
 }
