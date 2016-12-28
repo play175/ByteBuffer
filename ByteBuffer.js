@@ -252,12 +252,12 @@ var ByteBuffer = function (org_buf,offset) {
                     //前2个字节表示字符串长度
                     _org_buf['writeInt16'+_endian+'E'](_list[i].l,offset);
                     offset+=2;
-                    _org_buf.write(_list[i].d,_encoding,offset);
+                    _org_buf.write(_list[i].d, offset, _encoding);
                     offset+=_list[i].l;
                     break;
                 case Type_VString:
                     var vlen = Buffer.byteLength(_list[i].d, _encoding);//字符串实际长度
-                    _org_buf.write(_list[i].d,_encoding,offset);
+                    _org_buf.write(_list[i].d, offset, _encoding);
                     //补齐\0
                     for(var j = offset + vlen;j<offset+_list[i].l;j++){
                          _org_buf.writeUInt8(0,j);
