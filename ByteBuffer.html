@@ -56,21 +56,94 @@
                 }
             }
 
-            function stringToUint(string) {
-                var string = btoa(unescape(encodeURIComponent(string))),
-                    charList = string.split(''),
-                    uintArray = [];
-                for (var i = 0; i < charList.length; i++) {
-                    uintArray.push(charList[i].charCodeAt(0));
-                }
-                return new Uint8Array(uintArray);
-            }
+            function utf8Write(view, offset, str) {
+			  var c = 0;
+			  for (var i = 0, l = str.length; i < l; i++) {
+				c = str.charCodeAt(i);
+				if (c < 0x80) {
+				  view.setUint8(offset++, c);
+				}
+				else if (c < 0x800) {
+				  view.setUint8(offset++, 0xc0 | (c >> 6));
+				  view.setUint8(offset++, 0x80 | (c & 0x3f));
+				}
+				else if (c < 0xd800 || c >= 0xe000) {
+				  view.setUint8(offset++, 0xe0 | (c >> 12));
+				  view.setUint8(offset++, 0x80 | (c >> 6) & 0x3f);
+				  view.setUint8(offset++, 0x80 | (c & 0x3f));
+				}
+				else {
+				  i++;
+				  c = 0x10000 + (((c & 0x3ff) << 10) | (str.charCodeAt(i) & 0x3ff));
+				  view.setUint8(offset++, 0xf0 | (c >> 18));
+				  view.setUint8(offset++, 0x80 | (c >> 12) & 0x3f);
+				  view.setUint8(offset++, 0x80 | (c >> 6) & 0x3f);
+				  view.setUint8(offset++, 0x80 | (c & 0x3f));
+				}
+			  }
+			}
 
-            function uintToString(uintArray) {
-                var encodedString = String.fromCharCode.apply(null, uintArray),
-                    decodedString = decodeURIComponent(escape(atob(encodedString)));
-                return decodedString;
-            }
+			function utf8Read(view, offset, length) {
+			  var string = '', chr = 0;
+			  for (var i = offset, end = offset + length; i < end; i++) {
+				var byte = view.getUint8(i);
+				if ((byte & 0x80) === 0x00) {
+				  string += String.fromCharCode(byte);
+				  continue;
+				}
+				if ((byte & 0xe0) === 0xc0) {
+				  string += String.fromCharCode(
+					((byte & 0x0f) << 6) |
+					(view.getUint8(++i) & 0x3f)
+				  );
+				  continue;
+				}
+				if ((byte & 0xf0) === 0xe0) {
+				  string += String.fromCharCode(
+					((byte & 0x0f) << 12) |
+					((view.getUint8(++i) & 0x3f) << 6) |
+					((view.getUint8(++i) & 0x3f) << 0)
+				  );
+				  continue;
+				}
+				if ((byte & 0xf8) === 0xf0) {
+				  chr = ((byte & 0x07) << 18) |
+					((view.getUint8(++i) & 0x3f) << 12) |
+					((view.getUint8(++i) & 0x3f) << 6) |
+					((view.getUint8(++i) & 0x3f) << 0);
+				  if (chr >= 0x010000) { // surrogate pair
+					chr -= 0x010000;
+					string += String.fromCharCode((chr >>> 10) + 0xD800, (chr & 0x3FF) + 0xDC00);
+				  } else {
+					string += String.fromCharCode(chr);
+				  }
+				  continue;
+				}
+				throw new Error('Invalid byte ' + byte.toString(16));
+			  }
+			  return string;
+			}
+
+			function utf8Length(str) {
+			  var c = 0, length = 0;
+			  for (var i = 0, l = str.length; i < l; i++) {
+				c = str.charCodeAt(i);
+				if (c < 0x80) {
+				  length += 1;
+				}
+				else if (c < 0x800) {
+				  length += 2;
+				}
+				else if (c < 0xd800 || c >= 0xe000) {
+				  length += 3;
+				}
+				else {
+				  i++;
+				  length += 4;
+				}
+			  }
+			  return length;
+			}
 
             this.byte = function (val, index) {
                 if (arguments.length == 0) {
@@ -132,20 +205,17 @@
             **/
             this.string = function (val, index) {
                 if (arguments.length == 0) {
-                    var len = _org_buf.getInt16(_offset,_littleEndian);
-                    _offset += 2;
-                    var arr = new Uint8Array(_org_buf.buffer.slice(_offset, _offset + len));
-                    _list.push(uintToString(arr));
+                    var len = _org_buf.getInt32(_offset,_littleEndian);
+                    _offset += 4;
+                    _list.push(utf8Read(_org_buf,_offset,len));
                     _offset += len;
                 } else {
-                    var arr = null;
                     var len = 0;
                     if (val) {
-                        arr = stringToUint(val);
-                        len = arr.length;
+                        len = utf8Length(val);
                     }
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_String, d: arr, l: len });
-                    _offset += len + 2;
+                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_String, d: val, l: len });
+                    _offset += len + 4;
                 }
                 return this;
             };
@@ -163,17 +233,10 @@
                     for (var i = _offset; i < _offset + len; i++) {
                         if (_org_buf.getUint8(i) > 0) vlen++;
                     }
-                    var arr = new Uint8Array(_org_buf.buffer.slice(_offset, _offset + vlen));
-                    //console.log(arr);
-                    _list.push(uintToString(arr));
+                    _list.push(utf8Read(_org_buf,_offset,vlen));
                     _offset += len;
                 } else {
-                    var arr = null;
-                    if (val) {
-                        arr = stringToUint(val);
-                    }
-                    //console.log(arr);
-                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_VString, d: arr, l: len });
+                    _list.splice(index != undefined ? index : _list.length, 0, { t: Type_VString, d: val, l: len });
                     _offset += len;
                 }
                 return this;
@@ -279,23 +342,15 @@
                             offset += _list[i].l;
                             break;
                         case Type_String:
-                            //前2个字节表示字符串长度
-                            _org_buf.setUint16(offset, _list[i].l,_littleEndian);
-                            offset += 2;
-                            var indx = 0;
-                            for (var j = offset; j < offset + _list[i].l; j++) {
-                                _org_buf.setUint8(j, _list[i].d[indx]);
-                                indx++
-                            }
+                            //前4个字节表示字符串长度
+                            _org_buf.setUint32(offset, _list[i].l,_littleEndian);
+                            offset += 4;
+							utf8Write(_org_buf,offset,_list[i].d);
                             offset += _list[i].l;
                             break;
                         case Type_VString:
-                            var indx = 0;
-                            for (var j = offset; j < offset + _list[i].l; j++) {
-                                _org_buf.setUint8(j, _list[i].d[indx]);
-                                indx++
-                            }
-                            var vlen = _list[i].d.length;//字符串实际长度
+							utf8Write(_org_buf,offset,_list[i].d);
+                            var vlen = utf8Length(_list[i].d);//字符串实际长度
                             //补齐\0
                             for (var j = offset + vlen; j < offset + _list[i].l; j++) {
                                 _org_buf.setUint8(j, 0);
