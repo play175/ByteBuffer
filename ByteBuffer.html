@@ -27,9 +27,22 @@
             var Type_Double = 10;
             var Type_ByteArray = 11;
 
-            var _org_buf = arrayBuf ? (arrayBuf.constructor == DataView ? arrayBuf : new DataView(arrayBuf, offset)) : new DataView(new Uint8Array([]).buffer);
+            var _org_buf = arrayBuf ? (arrayBuf.constructor == DataView ? arrayBuf : (arrayBuf.constructor == Uint8Array ? new DataView(arrayBuf.buffer, offset) : new DataView(arrayBuf, offset))) : new DataView(new Uint8Array([]).buffer);
             var _offset = offset || 0;
             var _list = [];
+			var _littleEndian = false;
+    
+			//指定字节序 为BigEndian
+			this.bigEndian = function(){
+			   _littleEndian = false;
+				return this;
+			};
+
+			//指定字节序 为LittleEndian
+			this.littleEndian = function(){
+			   _littleEndian = true;
+				return this;
+			};
 
             if (!ArrayBuffer.prototype.slice) {
                 ArrayBuffer.prototype.slice = function (start, end) {
@@ -61,7 +74,7 @@
 
             this.byte = function (val, index) {
                 if (arguments.length == 0) {
-                    _list.push(_org_buf.getUint8(_offset));
+                    _list.push(_org_buf.getUint8(_offset,_littleEndian));
                     _offset += 1;
                 } else {
                     _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Byte, d: val, l: 1 });
@@ -72,7 +85,7 @@
 
             this.short = function (val, index) {
                 if (arguments.length == 0) {
-                    _list.push(_org_buf['getInt16'](_offset));
+                    _list.push(_org_buf.getInt16(_offset,_littleEndian));
                     _offset += 2;
                 } else {
                     _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Short, d: val, l: 2 });
@@ -83,7 +96,7 @@
 
             this.ushort = function (val, index) {
                 if (arguments.length == 0) {
-                    _list.push(_org_buf['getUint16'](_offset));
+                    _list.push(_org_buf.getUint16(_offset,_littleEndian));
                     _offset += 2;
                 } else {
                     _list.splice(index != undefined ? index : _list.length, 0, { t: Type_UShort, d: val, l: 2 });
@@ -94,7 +107,7 @@
 
             this.int32 = function (val, index) {
                 if (arguments.length == 0) {
-                    _list.push(_org_buf['getInt32'](_offset));
+                    _list.push(_org_buf.getInt32(_offset,_littleEndian));
                     _offset += 4;
                 } else {
                     _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Int32, d: val, l: 4 });
@@ -105,7 +118,7 @@
 
             this.uint32 = function (val, index) {
                 if (arguments.length == 0) {
-                    _list.push(_org_buf['getUint32'](_offset));
+                    _list.push(_org_buf.getUint32(_offset,_littleEndian));
                     _offset += 4;
                 } else {
                     _list.splice(index != undefined ? index : _list.length, 0, { t: Type_UInt32, d: val, l: 4 });
@@ -119,7 +132,7 @@
             **/
             this.string = function (val, index) {
                 if (arguments.length == 0) {
-                    var len = _org_buf['getInt16'](_offset);
+                    var len = _org_buf.getInt16(_offset,_littleEndian);
                     _offset += 2;
                     var arr = new Uint8Array(_org_buf.buffer.slice(_offset, _offset + len));
                     _list.push(uintToString(arr));
@@ -168,7 +181,7 @@
 
             this.int64 = function (val, index) {
                 if (arguments.length == 0) {
-                    _list.push(_org_buf['getFloat64'](_offset));
+                    _list.push(_org_buf.getFloat64(_offset,_littleEndian));
                     _offset += 8;
                 } else {
                     _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Int64, d: val, l: 8 });
@@ -179,7 +192,7 @@
 
             this.float = function (val, index) {
                 if (arguments.length == 0) {
-                    _list.push(_org_buf['getFloat32'](_offset));
+                    _list.push(_org_buf.getFloat32(_offset,_littleEndian));
                     _offset += 4;
                 } else {
                     _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Float, d: val, l: 4 });
@@ -190,7 +203,7 @@
 
             this.double = function (val, index) {
                 if (arguments.length == 0) {
-                    _list.push(_org_buf['getFloat64'](_offset));
+                    _list.push(_org_buf.getFloat64(_offset,_littleEndian));
                     _offset += 8;
                 } else {
                     _list.splice(index != undefined ? index : _list.length, 0, { t: Type_Double, d: val, l: 8 });
@@ -240,7 +253,7 @@
                 _org_buf = new DataView(new ArrayBuffer((ifHead) ? _offset + 2 : _offset));
                 var offset = 0;
                 if (ifHead) {
-                    _org_buf['setUint16'](offset, _offset);
+                    _org_buf.setUint16(offset, _offset,_littleEndian);
                     offset += 2;
                 }
                 for (var i = 0; i < _list.length; i++) {
@@ -250,24 +263,24 @@
                             offset += _list[i].l;
                             break;
                         case Type_Short:
-                            _org_buf['setInt16'](offset, _list[i].d);
+                            _org_buf.setInt16(offset, _list[i].d,_littleEndian);
                             offset += _list[i].l;
                             break;
                         case Type_UShort:
-                            _org_buf['setUint16'](offset, _list[i].d);
+                            _org_buf.setUint16(offset, _list[i].d,_littleEndian);
                             offset += _list[i].l;
                             break;
                         case Type_Int32:
-                            _org_buf['setInt32'](offset, _list[i].d);
+                            _org_buf.setInt32(offset, _list[i].d,_littleEndian);
                             offset += _list[i].l;
                             break;
                         case Type_UInt32:
-                            _org_buf['setUint32'](offset, _list[i].d);
+                            _org_buf.setUint32(offset, _list[i].d,_littleEndian);
                             offset += _list[i].l;
                             break;
                         case Type_String:
                             //前2个字节表示字符串长度
-                            _org_buf['setUint16'](offset, _list[i].l);
+                            _org_buf.setUint16(offset, _list[i].l,_littleEndian);
                             offset += 2;
                             var indx = 0;
                             for (var j = offset; j < offset + _list[i].l; j++) {
@@ -290,15 +303,15 @@
                             offset += _list[i].l;
                             break;
                         case Type_Int64:
-                            _org_buf['setFloat64'](offset, _list[i].d);
+                            _org_buf.setFloat64(offset, _list[i].d,_littleEndian);
                             offset += _list[i].l;
                             break;
                         case Type_Float:
-                            _org_buf['setFloat32'](offset, _list[i].d);
+                            _org_buf.setFloat32(offset, _list[i].d,_littleEndian);
                             offset += _list[i].l;
                             break;
                         case Type_Double:
-                            _org_buf['setFloat64'](offset, _list[i].d);
+                            _org_buf.setFloat64(offset, _list[i].d,_littleEndian);
                             offset += _list[i].l;
                             break;
                         case Type_ByteArray:
@@ -328,7 +341,7 @@
         }
 
         //压包操作
-        var sbuf = new ByteBuffer();
+        var sbuf = new ByteBuffer().littleEndian();
         var buffer = sbuf.string('abc123你好')//变长字符串，utf8编码，前两个字节表示字符串长度
             .int32(-999).uint32(999).float(-0.5)
             .int64(9999999).double(-0.000005).short(32767).ushort(65535)
@@ -341,7 +354,7 @@
         console.log(buffer);
 
         //解包操作
-        var rbuf = new ByteBuffer(buffer);
+        var rbuf = new ByteBuffer(buffer).littleEndian();
         //解包出来是一个数组
         var arr = rbuf.string()//变长字符串，utf8编码，前两个字节表示字符串长度
             .int32().uint32().float()
