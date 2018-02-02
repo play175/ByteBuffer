@@ -201,7 +201,7 @@
             };
 
             /**
-            * 变长字符串 前2个字节表示字符串长度
+            * 变长字符串 前4个字节表示字符串长度
             **/
             this.string = function (val, index) {
                 if (arguments.length == 0) {
@@ -302,7 +302,7 @@
             };
 
             /**
-            * 打包成二进制,在前面加上2个字节表示包长
+            * 打包成二进制,在前面加上4个字节表示包长
             **/
             this.packWithHead = function () {
                 return this.pack(true);
@@ -310,14 +310,14 @@
 
             /**
             * 打包成二进制
-            * @param ifHead 是否在前面加上2个字节表示包长
+            * @param ifHead 是否在前面加上4个字节表示包长
             **/
             this.pack = function (ifHead) {
-                _org_buf = new DataView(new ArrayBuffer((ifHead) ? _offset + 2 : _offset));
+                _org_buf = new DataView(new ArrayBuffer((ifHead) ? _offset + 4 : _offset));
                 var offset = 0;
                 if (ifHead) {
-                    _org_buf.setUint16(offset, _offset,_littleEndian);
-                    offset += 2;
+                    _org_buf.setUint32(offset, _offset,_littleEndian);
+                    offset += 4;
                 }
                 for (var i = 0; i < _list.length; i++) {
                     switch (_list[i].t) {
@@ -397,7 +397,7 @@
 
         //压包操作
         var sbuf = new ByteBuffer().littleEndian();
-        var buffer = sbuf.string('abc123你好')//变长字符串，utf8编码，前两个字节表示字符串长度
+        var buffer = sbuf.string('abc123你好')//变长字符串，utf8编码，前4个字节表示字符串长度
             .int32(-999).uint32(999).float(-0.5)
             .int64(9999999).double(-0.000005).short(32767).ushort(65535)
             .byte(255)
@@ -411,7 +411,7 @@
         //解包操作
         var rbuf = new ByteBuffer(buffer).littleEndian();
         //解包出来是一个数组
-        var arr = rbuf.string()//变长字符串，utf8编码，前两个字节表示字符串长度
+        var arr = rbuf.string()//变长字符串，utf8编码，前4个字节表示字符串长度
             .int32().uint32().float()
             .int64().double().short().ushort()
             .byte()
